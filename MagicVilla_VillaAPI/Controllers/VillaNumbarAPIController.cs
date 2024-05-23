@@ -76,5 +76,68 @@ namespace MagicVilla_VillaAPI.Controllers
             return _response;
         }
 
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest | StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<APIResponse>> CreateVillaNumber([FromBody] VillaNumberCreateDTO villaNumberCreatedDTO)
+        {
+            try
+            {
+                if (await _dbVillaNumber.GetAsync(u => u.VillNo == villaNumberCreatedDTO.VillNo) != null)
+                {
+                    ModelState.AddModelError("CustomeError", "Villa Number already Exists!");
+                    return BadRequest(ModelState);
+                }
+
+                if (villaNumberCreatedDTO == null)
+                {
+                    return BadRequest(villaNumberCreatedDTO);
+                }
+                VillaNumber villaNumber = _mapper.Map<VillaNumber>(villaNumberCreatedDTO);
+                await _dbVillaNumber.CreateAsync(villaNumber);
+                _response.Result = _mapper.Map<VillaNumberDTO>(villaNumber);
+                _response.StatusCode = HttpStatusCode.Created;
+                return CreatedAtRoute("GetVillaNumber", new { id = villaNumber.VillNo }, _response);
+            }
+           
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessage = new List<string>() { ex.Message };
+
+            }
+            return _response;
+        }
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest | StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<APIResponse>> DeleteVillaNumber(int id)
+        {
+          try
+            {
+                if(id == 0)
+                {
+                    return BadRequest();
+                }
+                var villaNumber = await _dbVillaNumber.GetAsync(u=> u.VillNo == id);
+                if(villaNumber == null)
+                {
+                    return NotFound();
+                }
+                await _dbVillaNumber.RemoveAsync(villaNumber);
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessage = new List<string>() { ex.Message };
+
+            }
+            return _response;
+        }
+
+
     }
 }
