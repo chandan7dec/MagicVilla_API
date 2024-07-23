@@ -8,22 +8,22 @@ namespace MagicVilla_VillaAPI.Controllers
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/UsersAuth")]
-    [ApiVersion("1.0")]
+    [ApiVersionNeutral]
     public class UserController : Controller
     {
-        private readonly IUserRepository   _userRepository;
+        private readonly IUserRepository _userRepository;
         protected APIResponse _response;
         public UserController(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            this._response = new();
+            _response = new();
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO model)
         {
             var loginResponse = await _userRepository.Login(model);
-            if(loginResponse.User == null || string.IsNullOrEmpty(loginResponse.Token))
+            if (loginResponse.User == null || string.IsNullOrEmpty(loginResponse.Token))
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
                 _response.IsSuccess = false;
@@ -40,7 +40,7 @@ namespace MagicVilla_VillaAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterationRequestDTO model)
         {
-           bool ifUserNameUnique = _userRepository.IsUniqueUser(model.UserName);
+            bool ifUserNameUnique = _userRepository.IsUniqueUser(model.UserName);
             if (!ifUserNameUnique)
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
@@ -56,7 +56,7 @@ namespace MagicVilla_VillaAPI.Controllers
                 _response.ErrorMessage.Add("Error while registering");
                 return BadRequest(_response);
             }
-            _response.StatusCode= HttpStatusCode.OK;
+            _response.StatusCode = HttpStatusCode.OK;
             _response.IsSuccess = true;
             return Ok(_response);
         }

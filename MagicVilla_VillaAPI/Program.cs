@@ -95,7 +95,7 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v2", new OpenApiInfo
     {
         Version = "v2.0",
-        Title = "Magic Villa V1",
+        Title = "Magic Villa V2",
         Description = "Api to manage Villa"
     });
 });
